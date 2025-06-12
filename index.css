@@ -3,12 +3,31 @@ body {
     padding: 10px;
     font-family: Arial, Helvetica, sans-serif;
     max-width: 302px;
-}
+  }
 
-label {
+  h1 {
+    padding: 30px 0 20px 27px;
+    color: #5f9341;
+  }
+  
+  h1::before {
+    content: "";
+    background-image: url('favicon-32x32.png');
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    top: 45px;
+    left: 385px;
+    background-size: cover;
+  }
+
+  h1 > span {
+    margin-left: -4px;
+  }
+  
+  label {
     color: #5f9341;
     font-weight: 900;
-    padding-top: 20px;
 }
 
 input {
