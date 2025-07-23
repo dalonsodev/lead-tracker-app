@@ -18,17 +18,19 @@ const database = getDatabase(app)
 // Referencia al nodo "leads" donde se almacenan las URLs
 const referenceInDB = ref(database, "leads")
 
-
+// Seleccionar elementos del DOM
 const inputEl = document.getElementById("input-el")
+const inputBtn = document.getElementById("input-btn")
 const ulEl = document.getElementById("ul-el")
 
 function render(leads) {
    let listItems = ""
    for (let i = 0; i < leads.length; i++) {
-      const escapedUrl = escapeHtml(leads[i])
+      const cleanUrl = removeProtocol(leads[i])
+      const escapedUrl = escapeHtml(cleanUrl)
       listItems += `
          <li>
-            <a target='_blank' href='${escapedUrl}'>
+            <a target='_blank' href='https://${escapedUrl}'>
                ${escapedUrl}
             </a>
          </li>
@@ -37,10 +39,21 @@ function render(leads) {
    ulEl.innerHTML = listItems
 }
 
-function escapeHtml(url) {
+function escapeHtml(urlText) {
    const div = document.createElement("div")
-   div.textContent = url
+   div.textContent = urlText
    return div.innerHTML
+}
+
+function removeProtocol(url) {
+   const trimmedUrl = url.trim().split(/\s+/).join("")
+   const prefixes = ["https://www.", "http://www.", "https://", "http://", "www."]
+   for (const prefix of prefixes) {
+      if (trimmedUrl.startsWith(prefix)) {
+         return trimmedUrl.replace(prefix, "")
+      }
+   }
+   return trimmedUrl
 }
 
 onValue(referenceInDB, function(snapshot) {
@@ -52,12 +65,16 @@ onValue(referenceInDB, function(snapshot) {
    }
 })
 
+inputEl.addEventListener("keypress", (e) => {
+   if (e.key === "Enter") inputBtn.click()
+})
+
+inputBtn.addEventListener("click", () => {
+   push(referenceInDB, inputEl.value.trim())
+   inputEl.value = "" 
+})
+
 document.getElementById("delete-btn").addEventListener("dblclick", function() {
    remove(referenceInDB)
    ulEl.innerHTML = ""
-})
-
-document.getElementById("input-btn").addEventListener("click", function() {
-   push(referenceInDB, inputEl.value)
-   inputEl.value = "" 
 })
