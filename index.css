@@ -13,7 +13,7 @@ body {
   
   h1::before {
     content: "";
-    background-image: url('favicon-32x32.png');
+    background-image: url('favicon/favicon-32x32.png');
     position: absolute;
     width: 24px;
     height: 24px;
