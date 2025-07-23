@@ -23,21 +23,6 @@ const inputEl = document.getElementById("input-el")
 const inputBtn = document.getElementById("input-btn")
 const ulEl = document.getElementById("ul-el")
 
-function render(leads) {
-   let listItems = ""
-   for (let i = 0; i < leads.length; i++) {
-      const cleanUrl = removeProtocol(leads[i])
-      const escapedUrl = escapeHtml(cleanUrl)
-      listItems += `
-         <li>
-            <a target='_blank' href='https://${escapedUrl}'>
-               ${escapedUrl}
-            </a>
-         </li>
-      `
-   }
-   ulEl.innerHTML = listItems
-}
 
 function escapeHtml(urlText) {
    const div = document.createElement("div")
@@ -46,7 +31,7 @@ function escapeHtml(urlText) {
 }
 
 function removeProtocol(url) {
-   const trimmedUrl = url.trim().split(/\s+/).join("")
+   const trimmedUrl = url.split(/\s+/).join("")
    const prefixes = ["https://www.", "http://www.", "https://", "http://", "www."]
    for (const prefix of prefixes) {
       if (trimmedUrl.startsWith(prefix)) {
@@ -56,22 +41,42 @@ function removeProtocol(url) {
    return trimmedUrl
 }
 
+function render(leads) {
+   let listItems = ""
+   for (let i = 0; i < leads.length; i++) {
+      const cleanUrl = removeProtocol(leads[i])
+      const escapedText = escapeHtml(cleanUrl)
+      listItems += `
+         <li>
+            <a target='_blank' href='https://${escapedText}'>
+               ${escapedText}
+            </a>
+         </li>
+      `
+   }
+   ulEl.innerHTML = listItems
+}
+
 onValue(referenceInDB, function(snapshot) {
-   const snapshotDoesExist = snapshot.exists()
-   if (snapshotDoesExist) {
-      const snapshotValues = snapshot.val()
-      const leads = Object.values(snapshotValues)
+   if (snapshot.exists()) {
+      const leads = Object.values(snapshot.val())
       render(leads)
    }
-})
-
-inputEl.addEventListener("keypress", (e) => {
-   if (e.key === "Enter") inputBtn.click()
+   else {
+      ulEl.innerHTML = ""
+   }
+}, (error) => {
+   console.error("Error reading data from Firebase", error)
 })
 
 inputBtn.addEventListener("click", () => {
-   push(referenceInDB, inputEl.value.trim())
+   const cleanUrl = removeProtocol(inputEl.value)
+   push(referenceInDB, cleanUrl)
    inputEl.value = "" 
+})
+
+inputEl.addEventListener("keydown", (e) => {
+   if (e.key === "Enter") inputBtn.click()
 })
 
 document.getElementById("delete-btn").addEventListener("dblclick", function() {
