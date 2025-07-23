@@ -25,15 +25,22 @@ const ulEl = document.getElementById("ul-el")
 function render(leads) {
    let listItems = ""
    for (let i = 0; i < leads.length; i++) {
+      const escapedUrl = escapeHtml(leads[i])
       listItems += `
          <li>
-            <a target='_blank' href='${leads[i]}'>
-               ${leads[i]}
+            <a target='_blank' href='${escapedUrl}'>
+               ${escapedUrl}
             </a>
          </li>
       `
    }
    ulEl.innerHTML = listItems
+}
+
+function escapeHtml(url) {
+   const div = document.createElement("div")
+   div.textContent = url
+   return div.innerHTML
 }
 
 onValue(referenceInDB, function(snapshot) {
